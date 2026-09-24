@@ -1,0 +1,11 @@
+-- Marketplace channel integrations typically do NOT require shipping-style
+-- shipment_tracking_status_mapping SQL. Samples use in-script status maps.
+--
+-- Generate this file ONLY if Step 2 / Uniware evidence for THIS ticket proves
+-- an RDBMS table must be seeded. Otherwise omit db.sql from Phase B output.
+--
+-- {{TABLE_NAME}} / {{COLUMNS}} / {{ROWS}} — fill only from confirmed schema.
+
+-- NEEDS_REVIEW: confirm table exists before executing.
+-- INSERT INTO {{TABLE_NAME}} ({{COLUMNS}}) VALUES
+-- ({{ROW_PLACEHOLDERS}});

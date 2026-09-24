@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/uniware/marketplace-integration/integration-spec.schema.json",
+  "title": "MarketplaceIntegrationSpec",
+  "description": "Phase A output for a Uniware marketplace/channel integration. Fields must trace to Uniware Source entity, Jira, or API docs.",
+  "type": "object",
+  "required": ["marketplace", "capabilities", "sourceConfiguration", "authentication", "assumptions", "questions", "confidence", "generationGate"],
+  "properties": {
+    "marketplace": {
+      "type": "object",
+      "required": ["name", "code", "sourceType"],
+      "properties": {
+        "name": { "type": "string" },
+        "code": { "type": "string", "pattern": "^[A-Z0-9_]+$" },
+        "sourceType": { "type": "string", "enum": ["MARKETPLACE", "CART", "B2B", "POS", "WMS", "QC", "UNKNOWN"] },
+        "localization": { "type": "string", "enum": ["NATIONAL", "INTERNATIONAL", "UNKNOWN"] },
+        "regionScope": { "type": "string", "description": "e.g. UAE only" },
+        "closestReference": { "type": "string", "description": "Optional developer-supplied reference code; never invent" },
+        "referenceReason": { "type": "string" },
+        "referenceDifferences": { "type": "string" }
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "required": ["pattern"],
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "enum": [
+            "username-password-token",
+            "partner-oauth-hmac",
+            "http-basic",
+            "private-app-api-key",
+            "rotating-refresh-token",
+            "other"
+          ]
+        },
+        "patternDescription": { "type": "string" },
+        "tokenTtlHours": { "type": "number" },
+        "refreshRotates": { "type": "boolean" },
+        "refreshMustSerialize": { "type": "boolean" },
+        "mandatoryHeaders": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "baseUrl": { "type": "string" },
+              "usedFor": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "syncModel": {
+      "type": "object",
+      "properties": {
+        "orderImport": { "type": "string", "enum": ["polling", "webhook-inbound", "hybrid", "none", "UNKNOWN"] },
+        "inventory": { "type": "string", "enum": ["push-sync", "push-async-poll", "none", "UNKNOWN"] },
+        "statusInbound": { "type": "string", "enum": ["polling", "webhook", "hybrid", "none", "UNKNOWN"] },
+        "statusOutbound": { "type": "string", "enum": ["notification-script", "none", "UNKNOWN"] },
+        "catalog": { "type": "string", "enum": ["supported", "not-supported", "UNKNOWN"] },
+        "listScriptStrategy": {
+          "type": "string",
+          "enum": ["generate", "omit-order-sync-off", "stub", "UNKNOWN"],
+          "description": "Required decision when orderImport is webhook-inbound"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["orderImport", "inventorySync", "statusSync", "catalogSync", "cancellation", "notification"],
+      "properties": {
+        "orderImport": { "type": "boolean" },
+        "inventorySync": { "type": "boolean" },
+        "statusSync": { "type": "boolean" },
+        "catalogSync": { "type": "boolean" },
+        "cancellation": { "type": "boolean" },
+        "notification": { "type": "boolean" },
+        "pendency": { "type": "boolean" },
+        "invoicing": { "type": "boolean" },
+        "shippingAllocation": { "type": "boolean" },
+        "dispatchVerification": { "type": "boolean" },
+        "webhookInbound": { "type": "boolean" },
+        "webhookOutboundRegistration": { "type": "boolean" },
+        "utilsScript": { "type": "boolean" },
+        "mcf": { "type": "boolean" },
+        "orderRepull": { "type": "boolean" },
+        "channelConfiguration": { "type": "boolean" },
+        "pricingInsideInventory": { "type": "boolean" }
+      }
+    },
+    "sourceConfiguration": {
+      "type": "object",
+      "properties": {
+        "sourceProperties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "value", "source"],
+            "properties": {
+              "name": { "type": "string" },
+              "value": {},
+              "scriptOnly": { "type": "boolean" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "sourceConfigurationParameters": { "type": "array" },
+        "connectors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "parameters"],
+            "properties": {
+              "name": { "type": "string" },
+              "displayName": { "type": "string" },
+              "verificationScriptName": { "type": "string" },
+              "requiredInOrderSync": { "type": "boolean" },
+              "requiredInInventorySync": { "type": "boolean" },
+              "parameters": { "type": "array" }
+            }
+          }
+        }
+      }
+    },
+    "statusMappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["channelStatus", "uniwareAction", "confidence"],
+        "properties": {
+          "channelStatus": { "type": "string" },
+          "uniwareAction": { "type": "string" },
+          "direction": { "type": "string", "enum": ["inbound", "outbound"] },
+          "confidence": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "scriptRequirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scriptName": { "type": "string" },
+          "propertyKey": { "type": "string" },
+          "required": { "type": "boolean" },
+          "apiSummary": { "type": "string" }
+        }
+      }
+    },
+    "fieldMappings": { "type": "array" },
+    "conflicts": { "type": "array" },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "questions": { "type": "array", "items": { "type": "string" } },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "generationGate": { "type": "string", "enum": ["BLOCKED", "NEEDS_REVIEW", "READY"] }
+  }
+}
